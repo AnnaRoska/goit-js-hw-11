@@ -2,9 +2,12 @@ import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 
 const loader = document.querySelector('.loader');
+const gallery = document.querySelector('.gallery');
+let lightbox = null;
 
 export function createGallery(images) {
-  return images
+  if (!images || images.length === 0) return;
+  const markup = images
     .map(
       ({
         webformatURL,
@@ -14,8 +17,8 @@ export function createGallery(images) {
         views,
         comments,
         downloads,
-      }) => {
-        return `
+      }) =>
+        `
         <li class="photo-card">
           <a href="${largeImageURL}">
           <img src="${webformatURL}" alt="${tags}" />
@@ -39,17 +42,21 @@ export function createGallery(images) {
             </ul>
           </div>
         </li>
-      `;
-      }
+         `
     )
     .join('');
+  gallery.insertAdjacentHTML('beforeend', markup);
+  if (!lightbox) {
+    lightbox = new SimpleLightbox('.gallery a', {
+      captionsData: 'alt',
+      captionDelay: 250,
+    });
+  } else {
+    lightbox.refresh();
+  }
 }
 export function clearGallery() {
-  const lightbox = new SimpleLightbox('.gallery a', {
-    captionsData: 'alt',
-    captionDelay: 250,
-  });
-  lightbox.refresh();
+  gallery.innerHTML = '';
 }
 export function showLoader() {
   loader.classList.remove('hidden');
